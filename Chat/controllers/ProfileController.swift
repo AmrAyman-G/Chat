@@ -24,7 +24,8 @@ class ProfileController: UIViewController,UIImagePickerControllerDelegate,UINavi
 //    var userProfile : [UserProfile] = [UserProfile(profileImage: UIImage(named: "test")! , name: "amr", email: "Email")]
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.hideKeyboardWhenTappedAround()
+        dismissKeyboard()
         // Do any additional setup after loading the view.
     }
     
@@ -113,7 +114,7 @@ class ProfileController: UIViewController,UIImagePickerControllerDelegate,UINavi
                 
                 if let currentUser = Auth.auth().currentUser?.phoneNumber, let currentUserName = self.nameTextField.text, let userEmail = self.emailTextField.text {
                     
-                    self.db.collection("UserProfile").addDocument(data: [
+                    self.db.collection(self.ids.userProfile).addDocument(data: [
                         self.ids.currentUserByPhone : currentUser,
                         self.ids.currentUserName: currentUserName,
                         self.ids.userEmail : userEmail,
@@ -122,6 +123,7 @@ class ProfileController: UIViewController,UIImagePickerControllerDelegate,UINavi
                                print("FireStore : \(error.localizedDescription)")
                            }else{
                                print("Successfully saved Data")
+                               self.performSegue(withIdentifier: "profileDone", sender: self)
                            }
                        }
                    }

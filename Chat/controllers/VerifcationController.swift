@@ -19,7 +19,8 @@ class VerifcationController: UIViewController {
    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.hideKeyboardWhenTappedAround()
+        dismissKeyboard()
     }
     
     @IBAction func tapToVerfy(_ sender: UIButton) {
@@ -33,6 +34,7 @@ class VerifcationController: UIViewController {
                 print(error.localizedDescription)
             }
             print("Sign in : \(String(describing: authResult))")
+            self.performSegue(withIdentifier: "VerificationDone", sender: self)
             
         }
         

@@ -8,6 +8,7 @@
 import UIKit
 import FirebaseCore
 import FirebaseAuth
+import FirebaseFirestore
 
 
 class PhoneController: UIViewController {
@@ -28,7 +29,9 @@ class PhoneController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let verificationID = UserDefaults.standard.string(forKey: "authVerificationID")
+        guard let verificationID = UserDefaults.standard.string(forKey: "authVerificationID")else{
+            return
+        }
         print(verificationID)
         btnCountery.addTarget(self, action: #selector(tapForCountery), for: .touchUpInside)
         
@@ -68,6 +71,7 @@ class PhoneController: UIViewController {
         let action = UIAlertAction(title: "OK", style: .default) { [self] action in
             let phoneNumber = "\(self.code ?? "+20") \(self.phoneTextfield.text!)"
             print(phoneNumber)
+        
             PhoneAuthProvider.provider()
                 .verifyPhoneNumber(phoneNumber, uiDelegate: nil) { verificationID, error in
                     if let error = error {
@@ -128,6 +132,28 @@ extension String{
         let cleanPhoneNumber = components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
         
         let mask = "XXX XXX XXXX"
+        
+        var result = ""
+        var startIndex = cleanPhoneNumber.startIndex
+        let endIndex = cleanPhoneNumber.endIndex
+        for charct in mask where startIndex < endIndex {
+            if charct == "X"{
+                result.append(cleanPhoneNumber[startIndex])
+                startIndex =  cleanPhoneNumber.index(after: startIndex)
+                
+                
+            }else{
+                result.append(charct)
+            }
+        }
+        return result
+    }
+    
+    func retriveformatMobileNumber() -> String{
+        
+        let cleanPhoneNumber = components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        
+        let mask = "XXX XXX XXXXXXX"
         
         var result = ""
         var startIndex = cleanPhoneNumber.startIndex

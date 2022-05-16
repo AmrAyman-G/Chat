@@ -29,14 +29,23 @@ class ProfileView: UIViewController {
 
     func retriveData(){
         
-        db.collection("UserProfile").getDocuments { snapshot, error in
+        db.collection(self.ids.userProfile).getDocuments { snapshot, error in
             if error == nil && snapshot != nil {
                 var imagePath = [String]()
+               
+                let currentUser = Auth.auth().currentUser?.phoneNumber
+               
                 for doc in snapshot!.documents{
-                    imagePath.append(doc[self.ids.userImage] as! String)
-                    self.labelName.text = (doc[self.ids.currentUserName] as! String)
-                    self.labelEmail.text = (doc[self.ids.userEmail] as! String)
-                    self.phoneNumber.text = (doc[self.ids.currentUserByPhone] as! String)
+                    let phoneNumber = doc[self.ids.currentUserByPhone] as? String
+                    if currentUser == phoneNumber {
+                        imagePath.append(doc[self.ids.userImage] as! String)
+                        self.labelName.text = (doc[self.ids.currentUserName] as! String)
+                        self.labelEmail.text = (doc[self.ids.userEmail] as! String)
+                        self.phoneNumber.text = (doc[self.ids.currentUserByPhone] as! String)
+                    }else{
+                        print("Bad Luck")
+                    }
+                    
                 }
                 
                 for iPath in imagePath {

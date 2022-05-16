@@ -6,85 +6,114 @@
 //
 
 import UIKit
+import Contacts
+import FirebaseAuth
+import FirebaseFirestore
 
 class HomeController: UITableViewController {
-
+    
+    var contacts = [Contacts]()
+    let db = Firestore.firestore()
+    let ids = IDs()
+    var phoneNumber = [String]()
+    
+//    var dC = [DeviceContacts]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        self.navigationItem.setHidesBackButton(true, animated: false)
+        tableView.register(userChatCell.nib(), forCellReuseIdentifier: userChatCell.identfier)
+        
+        getDevicePhoneNumber()
+        
         
     }
+    
+
+
 
     // MARK: - Table view data source
+    
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 0
+       
+        return 1
     }
+    
+    
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        
+        
+        return phoneNumber.count
     }
 
-    /*
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+    
+        override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ChatCell", for: indexPath)
+            cell.textLabel?.text = phoneNumber[indexPath.row]
+            cell.accessoryType = .disclosureIndicator
+               
         return cell
     }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    
+   
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
-    */
+    
 
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+    
+    func getDevicePhoneNumber(){
+        let keys = [CNContactGivenNameKey, CNContactPhoneNumbersKey,CNContactFamilyNameKey,CNContactEmailAddressesKey] as [CNKeyDescriptor]
+           let request = CNContactFetchRequest(keysToFetch: keys)
+           
+           let contactStore = CNContactStore()
+           do {
+               try contactStore.enumerateContacts(with: request) {[weak self]
+                   (contact, stop) in
+                   
+                   guard let strongSelf = self else {
+                       return
+                   }
+                   
+                   guard let number = contact.phoneNumbers.first?.value.stringValue else {
+                       return
+                   }
+                   let fullName = contact.givenName
+                   // Array containing all unified contacts from everywhere
+                   let contactsToAppend = Contacts(phoneNumber: number, name: fullName)
+                   strongSelf.contacts.append(contactsToAppend)
+                   if Auth.auth().currentUser?.phoneNumber == contact.phoneNumbers.first?.value.stringValue {
+//                       print(Auth.auth().currentUser?.phoneNumber)
+                   }
+                   
+                   strongSelf.db.collection(strongSelf.ids.userProfile).getDocuments {[weak self] snapShot, error in
+                       guard let strongSelf = self else {
+                           return
+                       }
+                       for doc in snapShot!.documents{
+                           if contact.phoneNumbers.first?.value.stringValue.cleanMobileNumberFormat() == doc[strongSelf.ids.currentUserByPhone] as? String {
+                               strongSelf.phoneNumber.append(doc[strongSelf.ids.currentUserByPhone] as! String)
+                               print("If Worked : \(strongSelf.phoneNumber)")
+                               strongSelf.tableView.reloadData()
+                           }else{
+                               print("Shit")
+                           }
+                       }
+                   }
+               }
+           }
+           catch {
+               print("unable to fetch contacts")
+           }
+        
+        
+        
     }
-    */
+    
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

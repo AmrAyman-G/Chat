@@ -13,6 +13,11 @@ import FirebaseAuth
           
       
 class ViewController: UIViewController {
+    
+
+    
+   
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 //        var countries: [String] = []
@@ -21,9 +26,15 @@ class ViewController: UIViewController {
             
         let currentUser = Auth.auth().currentUser?.phoneNumber
         if currentUser != nil{
-            performSegue(withIdentifier: "currntUserStilIn", sender: self)
+            
+           
+                performSegue(withIdentifier: "currntUserStilIn", sender: self)
+            
+            
+          
         }
     
+        
         
 //        for code in NSLocale.isoCountryCodes  {
 //            let id = NSLocale.localeIdentifier(fromComponents: [NSLocale.Key.countryCode.rawValue: code])
