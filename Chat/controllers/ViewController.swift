@@ -8,12 +8,15 @@
 import UIKit
 import FirebaseCore
 import FirebaseAuth
+import FirebaseFirestore
 
 
           
       
 class ViewController: UIViewController {
     
+    let db = Firestore.firestore()
+    let ids = IDs()
 
     
    
@@ -27,8 +30,8 @@ class ViewController: UIViewController {
         let currentUser = Auth.auth().currentUser?.phoneNumber
         if currentUser != nil{
             
-           
-                performSegue(withIdentifier: "currntUserStilIn", sender: self)
+            
+            performSegue(withIdentifier: "currntUserStilIn", sender: self)
             
             
           

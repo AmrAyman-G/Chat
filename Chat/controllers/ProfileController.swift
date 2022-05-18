@@ -19,7 +19,7 @@ class ProfileController: UIViewController,UIImagePickerControllerDelegate,UINavi
    
     @IBOutlet weak var profileImage: UIImageView!
     @IBOutlet weak var nameTextField: UITextField!
-    @IBOutlet weak var emailTextField: UITextField!
+//    @IBOutlet weak var emailTextField: UITextField!
     
 //    var userProfile : [UserProfile] = [UserProfile(profileImage: UIImage(named: "test")! , name: "amr", email: "Email")]
     override func viewDidLoad() {
@@ -112,12 +112,11 @@ class ProfileController: UIViewController,UIImagePickerControllerDelegate,UINavi
             
             if error == nil && metadata != nil {
                 
-                if let currentUser = Auth.auth().currentUser?.phoneNumber, let currentUserName = self.nameTextField.text, let userEmail = self.emailTextField.text {
-                    
+                if let phoneNum = UserDefaults.standard.string(forKey: "phoneNum"), let currentUserName = self.nameTextField.text {
+                
                     self.db.collection(self.ids.userProfile).addDocument(data: [
-                        self.ids.currentUserByPhone : currentUser,
+                        self.ids.currentUserByPhone : phoneNum,
                         self.ids.currentUserName: currentUserName,
-                        self.ids.userEmail : userEmail,
                         self.ids.userImage: imagePath]) { error in
                            if let error = error {
                                print("FireStore : \(error.localizedDescription)")

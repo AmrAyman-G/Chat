@@ -25,29 +25,37 @@ class PhoneController: UIViewController {
     
     var name:String = "Choose a country"
     var code:String?
+    var fullPhoneNum : String?
+//    let db = Firestore.firestore()
+    let ids = IDs()
   
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        guard let verificationID = UserDefaults.standard.string(forKey: "authVerificationID")else{
-            return
-        }
-        print(verificationID)
+       
+       
         btnCountery.addTarget(self, action: #selector(tapForCountery), for: .touchUpInside)
-        
         self.hideKeyboardWhenTappedAround()
         dismissKeyboard()
         phoneTextfield.isEnabled = false
         codeTextField.isEnabled = false
         codeTextField.text = nil
         phoneTextfield.text = nil
+        
+        guard let verificationID = UserDefaults.standard.string(forKey: "authVerificationID")else{
+            return
+        }
+        print(verificationID)
+        
+    
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         countryName.text = name
         if let cCode = code{
-            codeTextField.text = "\(cCode)"
+            codeTextField.text = cCode
             if codeTextField.text != nil {
                 phoneTextfield.isEnabled = true
                 self.phoneTextfield.becomeFirstResponder()
@@ -56,7 +64,21 @@ class PhoneController: UIViewController {
     }
     
     @IBAction func phoneValidation(_ sender: Any)  {
+        guard phoneTextfield.text?.prefix(1) != nil else{
+            return
+        }
+        guard let phoneText = phoneTextfield.text else{
+            return
+        }
         
+        
+        fullPhoneNum = phoneTextfield.text?.cleanMobileNumberFormat()
+        print(fullPhoneNum)
+        
+        if phoneTextfield.text?.prefix(1) == "0" && codeTextField.text?.last == "0"{
+            
+            phoneTextfield.text = replace(myString: phoneText, 0, " ").formatMobileNumber()
+        }
             phoneTextfield.text = phoneTextfield.text?.formatMobileNumber()
         
     }
@@ -71,9 +93,14 @@ class PhoneController: UIViewController {
         let action = UIAlertAction(title: "OK", style: .default) { [self] action in
             let phoneNumber = "\(self.code ?? "+20") \(self.phoneTextfield.text!)"
             print(phoneNumber)
-        
+         
             PhoneAuthProvider.provider()
-                .verifyPhoneNumber(phoneNumber, uiDelegate: nil) { verificationID, error in
+                .verifyPhoneNumber(phoneNumber, uiDelegate: nil) { [weak self] verificationID, error in
+                    
+                    guard let strongSelf = self else{
+                        return
+                    }
+                    
                     if let error = error {
 
                         print("Error : \(error.localizedDescription)")
@@ -83,6 +110,7 @@ class PhoneController: UIViewController {
                     }
                     print("done")
                     UserDefaults.standard.set(verificationID, forKey: "authVerificationID")
+                    UserDefaults.standard.set(strongSelf.fullPhoneNum, forKey: ids.uDPhoneNum)
                     performSegue(withIdentifier: "goToVerifcation", sender:  self)
 
                     // Sign in using the verificationID and the code sent to the user
@@ -112,13 +140,19 @@ class PhoneController: UIViewController {
     @objc func tapForCountery(){
         let story = UIStoryboard(name: "Main", bundle: nil)
         guard let controller = story.instantiateViewController(withIdentifier: "CountryController") as? CountryController else {
+            print("Error")
             return
         }
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
     
-    
+    func replace(myString: String, _ index: Int, _ newChar: String) -> String {
+        var chars = Array(myString)     // gets an array of characters
+        chars[index] = Character(newChar)
+        let modifiedString = String(chars)
+        return modifiedString
+    }
     
     
 }

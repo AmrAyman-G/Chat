@@ -14,7 +14,6 @@ class ProfileView: UIViewController {
    
     @IBOutlet weak var profileImage: UIImageView!
     @IBOutlet weak var labelName: UILabel!
-    @IBOutlet weak var labelEmail: UILabel!
     @IBOutlet weak var phoneNumber: UILabel!
     let db = Firestore.firestore()
     let ids = IDs()
@@ -33,15 +32,14 @@ class ProfileView: UIViewController {
             if error == nil && snapshot != nil {
                 var imagePath = [String]()
                
-                let currentUser = Auth.auth().currentUser?.phoneNumber
+                let currentUser = UserDefaults.standard.string(forKey: "phoneNum")
                
                 for doc in snapshot!.documents{
                     let phoneNumber = doc[self.ids.currentUserByPhone] as? String
                     if currentUser == phoneNumber {
                         imagePath.append(doc[self.ids.userImage] as! String)
                         self.labelName.text = (doc[self.ids.currentUserName] as! String)
-                        self.labelEmail.text = (doc[self.ids.userEmail] as! String)
-                        self.phoneNumber.text = (doc[self.ids.currentUserByPhone] as! String)
+                        self.phoneNumber.text = phoneNumber
                     }else{
                         print("Bad Luck")
                     }

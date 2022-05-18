@@ -13,6 +13,6 @@ struct IDs {
     let currentUserName = "currentUserName"
     let userEmail = "userEmail"
     let userImage = "userImage"
-    
+    let uDPhoneNum = "phoneNum"
     
 }

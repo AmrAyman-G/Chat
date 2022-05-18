@@ -23,7 +23,7 @@ class HomeController: UITableViewController {
         super.viewDidLoad()
         
         self.navigationItem.setHidesBackButton(true, animated: false)
-        tableView.register(userChatCell.nib(), forCellReuseIdentifier: userChatCell.identfier)
+        tableView.register(CurrentUserMessages.nib(), forCellReuseIdentifier: CurrentUserMessages.identfier)
         
         getDevicePhoneNumber()
         
@@ -62,6 +62,7 @@ class HomeController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        performSegue(withIdentifier: "privetChat", sender: self)
     }
     
 
@@ -95,7 +96,7 @@ class HomeController: UITableViewController {
                            return
                        }
                        for doc in snapShot!.documents{
-                           if contact.phoneNumbers.first?.value.stringValue.cleanMobileNumberFormat() == doc[strongSelf.ids.currentUserByPhone] as? String {
+                           if contact.phoneNumbers.first?.value.stringValue.cleanMobileNumberFormat() == doc[strongSelf.ids.currentUserByPhone] as? String && contact.phoneNumbers.first?.value.stringValue.cleanMobileNumberFormat() != UserDefaults.standard.string(forKey: strongSelf.ids.uDPhoneNum) {
                                strongSelf.phoneNumber.append(doc[strongSelf.ids.currentUserByPhone] as! String)
                                print("If Worked : \(strongSelf.phoneNumber)")
                                strongSelf.tableView.reloadData()
