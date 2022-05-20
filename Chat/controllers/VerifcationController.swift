@@ -63,18 +63,6 @@ class VerifcationController: UIViewController {
            }
            
        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+      
     }
-    
-  
-    
 }

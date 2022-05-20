@@ -32,7 +32,7 @@ class ProfileView: UIViewController {
             if error == nil && snapshot != nil {
                 var imagePath = [String]()
                
-                let currentUser = UserDefaults.standard.string(forKey: "phoneNum")
+                let currentUser = UserDefaults.standard.string(forKey: self.ids.uDPhoneNum)
                
                 for doc in snapshot!.documents{
                     let phoneNumber = doc[self.ids.currentUserByPhone] as? String

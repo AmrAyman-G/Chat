@@ -9,25 +9,36 @@ import UIKit
 import Contacts
 import FirebaseAuth
 import FirebaseFirestore
+import SwiftUI
+
+protocol passData{
+    func getData(num:String)
+}
 
 class HomeController: UITableViewController {
+   
+    
+    
+    
+    
     
     var contacts = [Contacts]()
     let db = Firestore.firestore()
     let ids = IDs()
     var phoneNumber = [String]()
+    var phone: String?
+    var delegate:passData?
+    var message: [newMessage] = []
     
-//    var dC = [DeviceContacts]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationItem.setHidesBackButton(true, animated: false)
-        tableView.register(CurrentUserMessages.nib(), forCellReuseIdentifier: CurrentUserMessages.identfier)
-        
+        let nib = UINib(nibName: "UserCell", bundle: nil)
+        tableView.register(nib, forCellReuseIdentifier: "UserCell")
         getDevicePhoneNumber()
-        
-        
+        resivedMessage()
     }
     
 
@@ -51,21 +62,57 @@ class HomeController: UITableViewController {
 
     
         override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ChatCell", for: indexPath)
-            cell.textLabel?.text = phoneNumber[indexPath.row]
+            let cell = tableView.dequeueReusableCell(withIdentifier: "UserCell", for: indexPath) as! UserCell
+            cell.cellName.text = phoneNumber[indexPath.row]
+            cell.cellMessage.text = message[indexPath.row].body
             cell.accessoryType = .disclosureIndicator
-               
         return cell
     }
     
-   
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+         //optional, to get from any UIButton for example
+        
+        let currentCell = tableView.cellForRow(at: indexPath)! as UITableViewCell
+        if let selectedUser = currentCell.textLabel?.text{
+            UserDefaults.standard.set(selectedUser, forKey: "UserFriend") 
+        }
+//        print("PHONE : \(phone)")
+        if let uRPhone = phone{delegate?.getData(num: uRPhone)}
+        
+        
+        
+        
         tableView.deselectRow(at: indexPath, animated: true)
         performSegue(withIdentifier: "privetChat", sender: self)
     }
+   
+   
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?)
+//    {
+//    if segue.destination is MessageViewController {
+//    let vc = segue.destination as? MessageViewController
+//        vc?.freindNum = value
+//    }
+//    }
     
-
+    func resivedMessage(){
+        db.collection("SMessages").order(by: "Time", descending: true).getDocuments { snapshot, error in
+            if  let document = snapshot?.documents{
+                for doc in document {
+                    let data = doc.data()
+                    if let body = data["Body"]  as? String {
+                        let messageB = newMessage(body: body)
+                        self.message.append(messageB)
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                    }
+                }
+            }
+           
+        }
+    }
     
     func getDevicePhoneNumber(){
         let keys = [CNContactGivenNameKey, CNContactPhoneNumbersKey,CNContactFamilyNameKey,CNContactEmailAddressesKey] as [CNKeyDescriptor]
@@ -110,11 +157,5 @@ class HomeController: UITableViewController {
            catch {
                print("unable to fetch contacts")
            }
-        
-        
-        
     }
-    
-
-
 }

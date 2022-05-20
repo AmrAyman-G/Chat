@@ -14,5 +14,6 @@ struct IDs {
     let userEmail = "userEmail"
     let userImage = "userImage"
     let uDPhoneNum = "phoneNum"
+    let messages = "Messages"
     
 }

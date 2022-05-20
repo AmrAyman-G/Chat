@@ -12,7 +12,7 @@ class MessagesTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.register(CurrentUserMessages.nib(), forCellReuseIdentifier: CurrentUserMessages.identfier)
+//        tableView.register(CurrentUserMessages.self, forCellReuseIdentifier: CurrentUserMessages.identifier)
     }
 
     // MARK: - Table view data source

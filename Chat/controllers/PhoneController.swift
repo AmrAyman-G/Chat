@@ -73,7 +73,7 @@ class PhoneController: UIViewController {
         
         
         fullPhoneNum = phoneTextfield.text?.cleanMobileNumberFormat()
-        print(fullPhoneNum)
+//        print(fullPhoneNum)
         
         if phoneTextfield.text?.prefix(1) == "0" && codeTextField.text?.last == "0"{
             
